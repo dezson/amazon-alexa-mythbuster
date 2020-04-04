@@ -1,0 +1,115 @@
+AWSTemplateFormatVersion: 2010-09-09
+Transform:
+- AWS::Serverless-2016-10-31
+Description: Sets up an service for vending myth information. 
+Parameters:
+  Stage:
+    Type: String
+    Description: The name for a project pipeline stage, such as Staging or Prod, for which resources are provisioned and deployed.
+    Default: staging
+
+Resources:
+  #Compute resources
+  APIGatewayServiceLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub 'Myth-Vendor-Lambda-${Stage}'
+      Handler: mythVendorLambda.get
+      InlineCode: |
+        console.Log("placeholder")
+      Runtime: nodejs10.x
+      Role:
+        Fn::GetAtt:
+        - LambdaExecutionRole
+        - Arn
+  #API
+  MythServiceAPIGateway:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: API for the serverless myth service.
+      Name: !Sub 'myth-api-${Stage}'
+  APIGatewayResourcesMyth:
+    Type: AWS::ApiGateway::Resource
+    Properties: 
+      ParentId: !GetAtt 
+        - MythServiceAPIGateway
+        - RootResourceId
+      PathPart: myth
+      RestApiId: !Ref "MythServiceAPIGateway"
+  APIGatewayMethod:
+    Type: "AWS::ApiGateway::Method"
+    DependsOn: 
+      - APIGatewayResourcesMyth
+    Properties:
+      AuthorizationType: "NONE"
+      HttpMethod: "GET"
+      OperationName: getMyth
+      Integration:
+        IntegrationHttpMethod: "POST"
+        Type: "AWS_PROXY"
+        Uri: !Sub
+          - "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${lambdaArn}/invocations"
+          - lambdaArn: !GetAtt "APIGatewayServiceLambda.Arn"
+      ResourceId: !Ref "APIGatewayResourcesMyth"
+      RestApiId: !Ref "MythServiceAPIGateway"
+  APIGatewayStage:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      Description: !Sub "${Stage} Stage"
+      RestApiId: !Ref MythServiceAPIGateway
+      DeploymentId: !Ref APIGatewayDeployment
+      Variables:
+        Stack: !Sub "${Stage}"
+      MethodSettings:
+        - ResourcePath: /myth
+          HttpMethod: GET
+  APIGatewayDeployment:
+    Type: "AWS::ApiGateway::Deployment"
+    DependsOn:
+      - "APIGatewayMethod"
+      - "APIGatewayResourcesMyth"
+    Properties:
+      RestApiId: !Ref "MythServiceAPIGateway"
+      StageName: !Sub "${Stage}"
+  #Logs
+  lambdaLogGroup:
+    Type: "AWS::Logs::LogGroup"
+    DependsOn: APIGatewayServiceLambda
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${APIGatewayServiceLambda}"
+      RetentionInDays: 90
+  #Roles
+  LambdaExecutionRole:
+    Description: Creating service role in IAM for AWS Lambda
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub 'service-lambda-role-${Stage}'
+      AssumeRolePolicyDocument:
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service: [lambda.amazonaws.com]
+          Action: 
+            - sts:AssumeRole
+      Policies:
+      - PolicyDocument:
+          Statement:
+          - Action: ['cloudwatch:*', 'logs:*', 's3:GetObject', 'lambda:*']
+            Effect: Allow
+            Resource: '*'
+          Version: '2012-10-17'
+        PolicyName: lambdaExecutionPolicy
+  #Permissions
+  lambdaApiGatewayInvoke:
+    Type: "AWS::Lambda::Permission"
+    DependsOn: 
+      - APIGatewayServiceLambda
+      - MythServiceAPIGateway
+    Properties:
+      Action: "lambda:InvokeFunction"
+      FunctionName: !GetAtt "APIGatewayServiceLambda.Arn"
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${MythServiceAPIGateway}/*/GET/*"
+Outputs:
+  apiGatewayInvokeURL:
+    Value: !Sub "https://${MythServiceAPIGateway}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
