@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform:
 - AWS::Serverless-2016-10-31
-Description: Sets up an service for vending myth information. 
+Description: Sets up an service for vending myth information.
 Parameters:
   Stage:
     Type: String
@@ -18,6 +18,9 @@ Resources:
       InlineCode: |
         console.Log("placeholder")
       Runtime: nodejs10.x
+      Environment:
+        Variables:
+          S3BucketName: {Ref: MythBucket}
       Role:
         Fn::GetAtt:
         - LambdaExecutionRole
@@ -30,15 +33,15 @@ Resources:
       Name: !Sub 'myth-api-${Stage}'
   APIGatewayResourcesMyth:
     Type: AWS::ApiGateway::Resource
-    Properties: 
-      ParentId: !GetAtt 
+    Properties:
+      ParentId: !GetAtt
         - MythServiceAPIGateway
         - RootResourceId
       PathPart: myth
       RestApiId: !Ref "MythServiceAPIGateway"
   APIGatewayMethod:
     Type: "AWS::ApiGateway::Method"
-    DependsOn: 
+    DependsOn:
       - APIGatewayResourcesMyth
     Properties:
       AuthorizationType: "NONE"
@@ -71,6 +74,11 @@ Resources:
     Properties:
       RestApiId: !Ref "MythServiceAPIGateway"
       StageName: !Sub "${Stage}"
+  #Storage/DB
+  MythBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+        AccessControl: Private
   #Logs
   lambdaLogGroup:
     Type: "AWS::Logs::LogGroup"
@@ -89,7 +97,7 @@ Resources:
         - Effect: Allow
           Principal:
             Service: [lambda.amazonaws.com]
-          Action: 
+          Action:
             - sts:AssumeRole
       Policies:
       - PolicyDocument:
@@ -102,7 +110,7 @@ Resources:
   #Permissions
   lambdaApiGatewayInvoke:
     Type: "AWS::Lambda::Permission"
-    DependsOn: 
+    DependsOn:
       - APIGatewayServiceLambda
       - MythServiceAPIGateway
     Properties:
