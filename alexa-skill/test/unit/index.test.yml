@@ -1,0 +1,12 @@
+---
+configuration:
+  locale: en-GB
+---
+- test: AMAZON.StopIntent
+- LaunchRequest
+- AMAZON.StopIntent: Goodbye!
+
+---
+- test: AMAZON.CancelIntent
+- LaunchRequest
+- AMAZON.CancelIntent: Goodbye!
