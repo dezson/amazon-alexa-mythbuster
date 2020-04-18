@@ -3,7 +3,7 @@
   "locale": "en-GB",
   "trace": true,
   "jest": {
-    "silent": false,
+    "silent": true,
     "collectCoverageFrom": ["lambda/custom/index.js"]
   }
 }
