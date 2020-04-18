@@ -1,0 +1,25 @@
+{
+  "manifest": {
+    "publishingInformation": {
+      "locales": {
+        "en-GB": {
+          "name": "skill-mythbuster",
+          "summary": "Mythbuster game",
+          "examplePhrases": [
+            "Aloha"
+          ],
+          "keywords": []
+        }
+      }
+    },
+    "apis": {
+      "custom": {
+        "endpoint": {
+          "sourceDir": "lambda/custom",
+          "uri": "LAMBDA_ARN"
+        }
+      }
+    },
+    "manifestVersion": "1.0"
+  }
+}
