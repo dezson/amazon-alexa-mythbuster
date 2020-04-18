@@ -3,41 +3,35 @@ const Alexa = require("ask-sdk-core");
 const LaunchRequestHandler = {
   canHandle(handlerInput) {
     console.log("Inside LaunchRequestHandler");
-    return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) === "LaunchRequest"
-    );
+    return Alexa.getRequestType(handlerInput.requestEnvelope) === "LaunchRequest";
   },
   handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak(welcomeMessage)
-      .reprompt(helpMessage)
-      .getResponse();
+    return handlerInput.responseBuilder.speak(welcomeMessage).reprompt(helpMessage).getResponse();
   },
 };
 
 const HelpIntentHandler = {
   canHandle(handlerInput) {
+    console.log("Inside HelpIntentHandler");
     return (
       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
       Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.HelpIntent"
     );
   },
   handle(handlerInput) {
-    return handlerInput.responseBuilder
-      .speak(helpMessage)
-      .reprompt(helpMessage)
-      .getResponse();
+    console.log("Inside HelpIntentHandler - handle");
+    return handlerInput.responseBuilder.speak(helpMessage).reprompt(helpMessage).getResponse();
   },
 };
 
-const CancelAndStopIntentHandler = {
+const CancelAndStopPauseIntentHandler = {
   canHandle(handlerInput) {
+    console.log("Inside CancelAndStopPauseIntentHandler");
     return (
       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
-      (Alexa.getIntentName(handlerInput.requestEnvelope) ===
-        "AMAZON.CancelIntent" ||
-        Alexa.getIntentName(handlerInput.requestEnvelope) ===
-          "AMAZON.StopIntent")
+      (Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.CancelIntent" ||
+        Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.StopIntent" ||
+        Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.PauseIntent")
     );
   },
   handle(handlerInput) {
@@ -47,15 +41,11 @@ const CancelAndStopIntentHandler = {
 
 const SessionEndedRequestHandler = {
   canHandle(handlerInput) {
-    return (
-      Alexa.getRequestType(handlerInput.requestEnvelope) ===
-      "SessionEndedRequest"
-    );
+    console.log("Inside SessionEndedRequestHandler");
+    return Alexa.getRequestType(handlerInput.requestEnvelope) === "SessionEndedRequest";
   },
   handle(handlerInput) {
-    console.log(
-      `~~~~ Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`
-    );
+    console.log(`~~~~ Session ended: ${JSON.stringify(handlerInput.requestEnvelope)}`);
     return handlerInput.responseBuilder.getResponse();
   },
 };
@@ -70,15 +60,19 @@ const ErrorHandler = {
   },
 };
 
-const helpMessage = `Help`;
-const welcomeMessage = `welcome`;
-const exitSkillMessage = `exit`;
+const welcomeMessage = `Welcome to the Mythbuster Game! You can ask me to start a quiz, \
+then you are going to have  10 myths from the well known Mythbuster series and you have to \
+decide the myths are whether confirmed or busted.`;
+
+const helpMessage = `You can test your mythbuster ability by asking me to start a quiz.`;
+
+const exitSkillMessage = `Goodbye!`;
 
 exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
     HelpIntentHandler,
-    CancelAndStopIntentHandler,
+    CancelAndStopPauseIntentHandler,
     SessionEndedRequestHandler
   )
   .addErrorHandlers(ErrorHandler)
