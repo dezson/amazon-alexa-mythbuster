@@ -1,1 +1,13 @@
-**/.ask/
+# Dependency directories
+node_modules/
+package-lock.json
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+
+# IDE related
+.idea/
+.vscode/
