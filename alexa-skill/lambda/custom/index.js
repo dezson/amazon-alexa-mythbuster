@@ -24,15 +24,14 @@ const StartHandler = {
       (request.intent.name === "StartIntent" || request.intent.name === "AMAZON.StartOverIntent")
     );
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     console.log("Inside StartHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const response = handlerInput.responseBuilder;
     attributes.counter = 0;
     attributes.score = 0;
 
-    // var statement = await getMyth(handlerInput);
-    var statement = "test";
+    var statement = await getMyth(handlerInput);
     var speakOutput = statement;
     var repromptOutput = statement;
 
