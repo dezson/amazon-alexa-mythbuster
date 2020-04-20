@@ -115,6 +115,7 @@ exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
     HelpIntentHandler,
+    StartHandler,
     CancelAndStopPauseIntentHandler,
     SessionEndedRequestHandler
   )
