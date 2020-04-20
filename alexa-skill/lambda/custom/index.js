@@ -24,14 +24,14 @@ const StartHandler = {
       (request.intent.name === "StartIntent" || request.intent.name === "AMAZON.StartOverIntent")
     );
   },
-  async handle(handlerInput) {
+  handle(handlerInput) {
     console.log("Inside StartHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const response = handlerInput.responseBuilder;
     attributes.counter = 0;
     attributes.score = 0;
 
-    var statement = await getMyth(handlerInput);
+    var statement = getMyth(handlerInput);
     var speakOutput = statement;
     var repromptOutput = statement;
 
@@ -115,7 +115,7 @@ exports.handler = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
     HelpIntentHandler,
-    // StartHandler,
+    StartHandler,
     CancelAndStopPauseIntentHandler,
     SessionEndedRequestHandler
   )
