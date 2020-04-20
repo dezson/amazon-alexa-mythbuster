@@ -10,3 +10,25 @@ configuration:
 - test: AMAZON.CancelIntent
 - LaunchRequest
 - AMAZON.CancelIntent: Goodbye!
+
+---
+- test: AMAZON.PauseIntent
+- LaunchRequest
+- AMAZON.PauseIntent: Goodbye!
+
+---
+- test: Launch request, AMAZON.HelpIntent and AMAZON.CancelIntent.
+- LaunchRequest
+- AMAZON.HelpIntent:
+    - response.outputSpeech.ssml: You can test your mythbuster skill*
+    - response.reprompt.outputSpeech.ssml: You can test your mythbuster skill*
+    - response.shouldEndSession: false
+- AMAZON.CancelIntent: Goodbye!
+
+---
+- test: Launch request, no further interaction and AMAZON.StopIntent.
+- LaunchRequest:
+    - response.outputSpeech.ssml: /Welcome to the Mythbuster Game! */i
+    - response.reprompt.outputSpeech.ssml: You can test your mythbuster*
+    - response.shouldEndSession: false
+- AMAZON.StopIntent: Goodbye!
