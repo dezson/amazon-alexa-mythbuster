@@ -4,7 +4,7 @@ node_js:
 
 cache:
   directories:
-    - lambda/node_modules
+    - lambda/custom/node_modules
 install:
   - npm install -g bespoken-tools
   - npm install codecov -g
