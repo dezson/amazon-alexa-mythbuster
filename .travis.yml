@@ -7,7 +7,9 @@ cache:
     - lambda/node_modules
 install:
   - npm install -g bespoken-tools
+  - npm install codecov -g
   - cd alexa-skill/lambda/custom && npm install
   - cd ../..
 script:
   - bst test
+  - codecov
