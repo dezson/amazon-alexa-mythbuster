@@ -7,7 +7,7 @@ cache:
     - lambda/node_modules
 install:
   - npm install -g bespoken-tools
-  - cd alexa-skill/lambda/ && npm install
+  - cd alexa-skill/lambda/custom && npm install
   - cd ..
 script:
   - bst test

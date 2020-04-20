@@ -20,12 +20,27 @@
           "samples": []
         },
         {
+          "name": "AMAZON.StartOverIntent",
+          "samples": []
+        },
+        {
           "name": "AMAZON.NavigateHomeIntent",
           "samples": []
         },
         {
           "name": "AMAZON.FallbackIntent",
           "samples": []
+        },
+        {
+          "name": "StartIntent",
+          "samples": [
+            "start the game",
+            "ready to play",
+            "start the quiz",
+            "quiz me",
+            "for a quiz",
+            "start"
+          ]
         }
       ],
       "types": []

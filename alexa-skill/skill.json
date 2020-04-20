@@ -5,7 +5,9 @@
         "en-GB": {
           "name": "skill-mythbuster",
           "summary": "Mythbuster game",
-          "examplePhrases": ["Alexa open mythbuster"],
+          "examplePhrases": [
+            "Alexa open mythbuster"
+          ],
           "keywords": []
         }
       }
