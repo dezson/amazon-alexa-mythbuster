@@ -97,8 +97,10 @@ const helpMessage = "You can test your mythbuster skill by asking me to start th
 const exitSkillMessage = "Goodbye!";
 
 /* HELPER FUNCTIONS */
-async function getMyth(handlerInput) {
-  const mythItem = await httpGet(resourceURL);
+function getMyth(handlerInput) {
+  const mythItem = async () => {
+    return await httpGet(resourceURL);
+  };
 
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   attributes.mythItem = mythItem;
