@@ -4,6 +4,31 @@
       "invocationName": "mythbuster",
       "intents": [
         {
+          "name": "AnswerIntent",
+          "slots": [
+            {
+              "name": "confirmed",
+              "type": "CONFIRMED_ANSWER"
+            },
+            {
+              "name": "busted",
+              "type": "BUSTED_ANSWER"
+            }
+          ],
+          "samples": [
+            "the answer is {confirmed}",
+            "my answer is {confirmed}",
+            "is it {confirmed}",
+            "{confirmed} is my answer",
+            "{confirmed}",
+            "the answer is {busted}",
+            "my answer is {busted}",
+            "is it {busted}",
+            "{busted} is my answer",
+            "{busted}"
+          ]
+        },
+        {
           "name": "AMAZON.CancelIntent",
           "samples": []
         },
@@ -56,7 +81,30 @@
           ]
         }
       ],
-      "types": []
+      "types": [
+        {
+          "name": "CONFIRMED_ANSWER",
+          "values": [
+            {
+              "name": {
+                "value": "confirmed",
+                "synonyms": ["true"]
+              }
+            }
+          ]
+        },
+        {
+          "name": "BUSTED_ANSWER",
+          "values": [
+            {
+              "name": {
+                "value": "busted",
+                "synonyms": ["false"]
+              }
+            }
+          ]
+        }
+      ]
     }
   }
 }
