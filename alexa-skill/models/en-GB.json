@@ -24,11 +24,11 @@
           "samples": []
         },
         {
-          "name": "AMAZON.NavigateHomeIntent",
+          "name": "AMAZON.FallbackIntent",
           "samples": []
         },
         {
-          "name": "AMAZON.FallbackIntent",
+          "name": "AMAZON.RepeatHandler",
           "samples": []
         },
         {
