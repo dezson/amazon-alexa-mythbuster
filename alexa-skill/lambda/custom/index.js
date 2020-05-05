@@ -61,7 +61,7 @@ const AnswerHandler = {
       speakOutput = getSpeechCon(false);
     }
 
-    speakOutput += getAnswer(item);
+    speakOutput += getExplanation(item);
 
     var question = getMyth(handlerInput);
     speakOutput += question;
@@ -120,19 +120,19 @@ const ExitHandler = {
 const RepeatHandler = {
   canHandle(handlerInput) {
     console.log("Inside RepeatHandler");
-    // const request = handlerInput.requestEnvelope.request;
 
     return (
       Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
-      Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.RepeatHandler"
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.RepeatIntent"
     );
   },
   handle(handlerInput) {
     console.log("Inside RepeatHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const question = questionBuilder(attributes.mythItem);
+    const mythItem = attributes.mythItem;
+    const question = questionBuilder(mythItem);
 
-    return handlerInput.responseBuilder.speak(messages.HELP).reprompt(messages.HELP).getResponse();
+    return handlerInput.responseBuilder.speak(question).reprompt(question).getResponse();
   },
 };
 
@@ -212,20 +212,24 @@ messages = {
 
 /* HELPER FUNCTIONS */
 function getMyth(handlerInput) {
-  const mythItem = async () => {
-    return await httpGet(resourceURL);
-  };
+  let mythItem;
+  try {
+    mythItem = async () => {
+      return await httpGet(resourceURL);
+    };
+  } catch (error) {
+    const response = responseBuilder.speak(messages.ERROR).getResponse();
+    return response;
+  }
 
   const attributes = handlerInput.attributesManager.getSessionAttributes();
   attributes.mythItem = mythItem;
-  // attributes.counter += 1;
-  // handlerInput.attributesManager.setSessionAttributes(attributes);
+
+  handlerInput.attributesManager.setSessionAttributes(attributes);
   return questionBuilder(mythItem);
-  // return questionBuilder(attributes.counter, mythItem);
 }
 
 function questionBuilder(item) {
-  // return `Here is your ${counter}th question. ${item.Statement}. What do you think, is it CONFIRMED or PLAUSIBLE?`;
   return `Here is your question. ${item.statement}. What do you think, is it CONFIRMED or PLAUSIBLE?`;
 }
 
@@ -254,7 +258,7 @@ function getSpeechCon(type) {
   } </say-as><break strength='strong'/>`;
 }
 
-function getAnswer(item) {
+function getExplanation(item) {
   return item.explanation;
 }
 
