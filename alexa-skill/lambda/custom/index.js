@@ -10,7 +10,10 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === "LaunchRequest";
   },
   handle(handlerInput) {
-    return handlerInput.responseBuilder.speak(messages.WELCOME).reprompt(HELP).getResponse();
+    return handlerInput.responseBuilder
+      .speak(messages.WELCOME)
+      .reprompt(messages.HELP)
+      .getResponse();
   },
 };
 
@@ -117,17 +120,19 @@ const ExitHandler = {
 const RepeatHandler = {
   canHandle(handlerInput) {
     console.log("Inside RepeatHandler");
-    const attributes = handlerInput.attributesManager.getSessionAttributes();
-    const request = handlerInput.requestEnvelope.request;
+    // const request = handlerInput.requestEnvelope.request;
 
-    return request.type === "IntentRequest" && request.intent.name === "AMAZON.RepeatHandler";
+    return (
+      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.RepeatHandler"
+    );
   },
   handle(handlerInput) {
     console.log("Inside RepeatHandler - handle");
     const attributes = handlerInput.attributesManager.getSessionAttributes();
     const question = questionBuilder(attributes.mythItem);
 
-    return handlerInput.responseBuilder.speak(question).reprompt(question).getResponse();
+    return handlerInput.responseBuilder.speak(messages.HELP).reprompt(messages.HELP).getResponse();
   },
 };
 
@@ -221,7 +226,7 @@ function getMyth(handlerInput) {
 
 function questionBuilder(item) {
   // return `Here is your ${counter}th question. ${item.Statement}. What do you think, is it CONFIRMED or PLAUSIBLE?`;
-  return `Here is your  question. ${item.Statement}. What do you think, is it CONFIRMED or PLAUSIBLE?`;
+  return `Here is your question. ${item.statement}. What do you think, is it CONFIRMED or PLAUSIBLE?`;
 }
 
 function compareSlots(slots, value) {

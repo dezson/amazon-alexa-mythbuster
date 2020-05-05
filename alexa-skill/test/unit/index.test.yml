@@ -35,4 +35,4 @@ configuration:
 
 ---
 - test: StartIntent direct call
-- StartIntent: /here is your .*/i
+- StartIntent: /Here is your question.*/i
