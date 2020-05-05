@@ -37,7 +37,10 @@ const AnswerHandler = {
   canHandle(handlerInput) {
     console.log("Inside AnswerHandler");
     const request = handlerInput.requestEnvelope.request;
-    return request.type === "IntentRequest" && request.intent.name === "AnswerIntent";
+    return (
+      request.type === "IntentRequest" &&
+      (request.intent.name === "AnswerIntent" || request.intent.name === "DontKnowIntent")
+    );
   },
   handle(handlerInput) {
     console.log("Inside AnswerHandler - handle");

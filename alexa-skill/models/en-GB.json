@@ -32,6 +32,19 @@
           "samples": []
         },
         {
+          "name": "DontKnowIntent",
+          "samples": [
+            "i don't know",
+            "don't know",
+            "skip",
+            "i don't know that",
+            "who knows",
+            "i don't know this question",
+            "i don't know that one",
+            "dunno"
+          ]
+        },
+        {
           "name": "StartIntent",
           "samples": [
             "start the game",
