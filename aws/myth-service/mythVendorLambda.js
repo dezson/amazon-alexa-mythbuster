@@ -24,7 +24,7 @@ exports.get = async function (event, context, callback) {
     callback(null, errorResp);
   }
 
-  var resp = { statement: mythItem[0], answer: mythItem[1], explanation: mythItem[0] };
+  var resp = { statement: mythItem[0], answer: mythItem[1], explanation: mythItem[2] };
 
   var result = {
     statusCode: 200,
