@@ -1,7 +1,4 @@
 ---
-configuration:
-  locale: en-GB
----
 - test: AMAZON.StopIntent
 - LaunchRequest
 - AMAZON.StopIntent: Goodbye!
@@ -20,19 +17,29 @@ configuration:
 - test: Launch request, AMAZON.HelpIntent and AMAZON.CancelIntent.
 - LaunchRequest
 - AMAZON.HelpIntent:
-    - response.outputSpeech.ssml: You can test your mythbuster skill*
-    - response.reprompt.outputSpeech.ssml: You can test your mythbuster skill*
-    - response.shouldEndSession: false
+      - response.outputSpeech.ssml: You can test your mythbuster skill*
+      - response.reprompt.outputSpeech.ssml: You can test your mythbuster skill*
+      - response.shouldEndSession: false
 - AMAZON.CancelIntent: Goodbye!
 
 ---
 - test: Launch request, no further interaction and AMAZON.StopIntent.
 - LaunchRequest:
-    - response.outputSpeech.ssml: /Welcome to the Mythbuster Game! */i
-    - response.reprompt.outputSpeech.ssml: You can test your mythbuster*
-    - response.shouldEndSession: false
+      - response.outputSpeech.ssml: /Welcome to the Mythbuster Game! */i
+      - response.reprompt.outputSpeech.ssml: You can test your mythbuster*
+      - response.shouldEndSession: false
 - AMAZON.StopIntent: Goodbye!
 
 ---
-- test: StartIntent direct call
+- test: Launch request, starting the game then repeating the question
+- LaunchRequest
 - StartIntent: /Here is your question.*/i
+- AMAZON.RepeatIntent:
+      - response.outputSpeech.ssml: /Here is your question.*/i
+      - response.reprompt.outputSpeech.ssml: /Here is your question.*/i
+
+---
+- test: Launch request, starting the game then answering the question
+- LaunchRequest
+- StartIntent: /Here is your question.*/i
+- AnswerIntent: /<speak><say-as interpret-as='interjection'>*/
