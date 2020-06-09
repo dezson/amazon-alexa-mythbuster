@@ -78,7 +78,8 @@
             "quiz me",
             "for a quiz",
             "start"
-          ]
+          ],
+          "slots": []
         }
       ],
       "types": [

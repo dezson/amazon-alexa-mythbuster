@@ -19,55 +19,61 @@ const LaunchRequestHandler = {
 
 const GetNewMythHandler = {
   canHandle(handlerInput) {
-    const request = handlerInput.requestEnvelope.request;
     console.log("Inside GetNewMythHandler");
-    console.log(JSON.stringify(request));
     return (
-      request.type === "IntentRequest" &&
-      (request.intent.name === "StartIntent" || request.intent.name === "AMAZON.StartOverIntent")
+      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+      (Alexa.getIntentName(handlerInput.requestEnvelope) === "StartIntent" ||
+        Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.StartOverIntent")
     );
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     console.log("Inside GetNewMythHandler - handle");
-    const response = handlerInput.responseBuilder;
-    const question = getMyth(handlerInput);
 
-    return response.speak(question).reprompt(question).getResponse();
+    const randomFact = await httpGet(resourceURL);
+    console.log(`GetNewMythHandler randomFact: ${randomFact}`);
+
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    attributes.mythItem = randomFact;
+    handlerInput.attributesManager.setSessionAttributes(attributes);
+
+    const question = questionBuilder(randomFact);
+    return handlerInput.responseBuilder.speak(question).reprompt(question).getResponse();
   },
 };
 
 const AnswerHandler = {
   canHandle(handlerInput) {
     console.log("Inside AnswerHandler");
-    const request = handlerInput.requestEnvelope.request;
     return (
-      request.type === "IntentRequest" &&
-      (request.intent.name === "AnswerIntent" || request.intent.name === "DontKnowIntent")
+      Alexa.getRequestType(handlerInput.requestEnvelope) === "IntentRequest" &&
+      Alexa.getIntentName(handlerInput.requestEnvelope) === "AnswerIntent"
     );
   },
-  handle(handlerInput) {
+  async handle(handlerInput) {
     console.log("Inside AnswerHandler - handle");
-    const response = handlerInput.responseBuilder;
-    var speakOutput = ``;
-    var repromptOutput = ``;
-    const item = attributes.mythItem;
+    var speakOutput;
+    var repromptOutput;
 
+    const attributes = handlerInput.attributesManager.getSessionAttributes();
+    const item = attributes.mythItem;
     const isCorrect = compareSlots(handlerInput.requestEnvelope.request.intent.slots, item.answer);
 
     if (isCorrect) {
       speakOutput = getSpeechCon(true);
-      handlerInput.attributesManager.setSessionAttributes(attributes);
     } else {
       speakOutput = getSpeechCon(false);
     }
 
     speakOutput += getExplanation(item);
+    var randomFact = await httpGet(resourceURL);
+    attributes.mythItem = randomFact;
+    handlerInput.attributesManager.setSessionAttributes(attributes);
 
-    var question = getMyth(handlerInput);
+    const question = " " + questionBuilder(randomFact);
     speakOutput += question;
     repromptOutput = question;
 
-    return response.speak(question).reprompt(question).getResponse();
+    return handlerInput.responseBuilder.speak(speakOutput).reprompt(repromptOutput).getResponse();
   },
 };
 
@@ -103,13 +109,12 @@ const CancelAndStopPauseIntentHandler = {
 const ExitHandler = {
   canHandle(handlerInput) {
     console.log("Inside ExitHandler");
-    const request = handlerInput.requestEnvelope.request;
 
     return (
-      request.type === `IntentRequest` &&
-      (request.intent.name === "AMAZON.StopIntent" ||
-        request.intent.name === "AMAZON.PauseIntent" ||
-        request.intent.name === "AMAZON.CancelIntent")
+      Alexa.getRequestType(handlerInput.requestEnvelope) === `IntentRequest` &&
+      (Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.StopIntent" ||
+        Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.PauseIntent" ||
+        Alexa.getIntentName(handlerInput.requestEnvelope) === "AMAZON.CancelIntent")
     );
   },
   handle(handlerInput) {
@@ -138,10 +143,13 @@ const RepeatHandler = {
 
 const ErrorHandler = {
   canHandle() {
+    console.log("Inside ErrorHandler");
     return true;
   },
   handle(handlerInput, error) {
-    console.log(`~~~~ Error handled: ${JSON.stringify(error)}`);
+    console.log("Inside ErrorHandler - handle");
+    console.log(`Error handled: ${JSON.stringify(error)}`);
+    console.log(`Handler Input: ${JSON.stringify(handlerInput)}`);
     return handlerInput.responseBuilder.speak(messages.ERROR).getResponse();
   },
 };
@@ -149,12 +157,12 @@ const ErrorHandler = {
 /* CONSTANTS */
 messages = {
   WELCOME: `Welcome to the Mythbuster Game! You can ask me to start the game, \
-    then you are going to have  10 myths from the well known Mythbuster series and you have to \
+    then you are going to have myths from the well known Mythbuster series and you have to \
     decide the myths are whether confirmed or busted.`,
   HELP: "You can test your mythbuster skill by asking me to start the game.",
   EXIT: "Goodbye!",
   ERROR: "Sorry, an error occurred.",
-  CORREC_ANSWER: [
+  CORRECT_ANSWER: [
     "Booya",
     "All righty",
     "Bam",
@@ -211,26 +219,8 @@ messages = {
 };
 
 /* HELPER FUNCTIONS */
-function getMyth(handlerInput) {
-  let mythItem;
-  try {
-    mythItem = async () => {
-      return await httpGet(resourceURL);
-    };
-  } catch (error) {
-    const response = responseBuilder.speak(messages.ERROR).getResponse();
-    return response;
-  }
-
-  const attributes = handlerInput.attributesManager.getSessionAttributes();
-  attributes.mythItem = mythItem;
-
-  handlerInput.attributesManager.setSessionAttributes(attributes);
-  return questionBuilder(mythItem);
-}
-
-function questionBuilder(item) {
-  return `Here is your question. ${item.statement}. What do you think, is it CONFIRMED or PLAUSIBLE?`;
+function questionBuilder(mythObject) {
+  return `Here is your question. ${mythObject.statement}. What do you think, is it CONFIRMED or BUSTED?`;
 }
 
 function compareSlots(slots, value) {
@@ -251,11 +241,11 @@ function getRandom(min, max) {
 function getSpeechCon(type) {
   if (type)
     return `<say-as interpret-as='interjection'>${
-      messages.CORREC_ANSWER[getRandom(0, messages.CORREC_ANSWER.length - 1)]
+      messages.CORRECT_ANSWER[getRandom(0, messages.CORRECT_ANSWER.length - 1)]
     }! </say-as><break strength='strong'/>`;
   return `<say-as interpret-as='interjection'>${
-    WRONG_ANSWER[getRandom(0, WRONG_ANSWER.length - 1)]
-  } </say-as><break strength='strong'/>`;
+    messages.WRONG_ANSWER[getRandom(0, messages.WRONG_ANSWER.length - 1)]
+  } !</say-as><break strength='strong'/>`;
 }
 
 function getExplanation(item) {
