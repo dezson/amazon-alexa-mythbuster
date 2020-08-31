@@ -6,7 +6,7 @@ cache:
   directories:
     - lambda/custom/node_modules
 install:
-  - npm install -g bespoken-tools
+  - npm install -g bespoken-tools@2.4.65
   - npm install codecov -g
   - cd alexa-skill/lambda/custom && npm install
   - cd ../..
