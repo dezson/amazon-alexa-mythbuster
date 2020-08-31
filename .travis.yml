@@ -11,5 +11,5 @@ install:
   - cd alexa-skill/lambda/custom && npm install
   - cd ../..
 script:
-  - bst test
+  # - bst test
   - codecov
